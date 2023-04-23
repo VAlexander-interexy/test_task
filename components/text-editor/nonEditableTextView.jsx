@@ -10,33 +10,41 @@ import { isMobile } from "react-device-detect";
 export default (prop) => {
   const [response, setResponse] = useState();
   const [showLoading, setShowLoading] = useState(true);
-  var apiCalled = false;;
-  const { setShowSuggestionsModal, setIsSuggestedTextAdded, apiCalled1stTime, setDisableNextButton, setApiCalled1stTime } = useContext(TiptapContext)
+  var apiCalled = false;
+  const {
+    setShowSuggestionsModal,
+    setIsSuggestedTextAdded,
+    apiCalled1stTime,
+    setDisableNextButton,
+    setApiCalled1stTime,
+  } = useContext(TiptapContext);
   const [suggestedTextEnabled, setSuggestedTextEnabled] = useState(true);
 
-  const [backendURL, setBackendURL] = useState(`${SECOND_BACKEND_URL}/ai/api/generate-sentence-landing`);
+  const [backendURL, setBackendURL] = useState(
+    `${SECOND_BACKEND_URL}/ai/api/generate-sentence-landing`,
+  );
 
   useEffect(() => {
     // see if current url is index.js
     if (window.location.pathname === "/") {
       // if so, set suggestedTextEnabled to true
       setSuggestedTextEnabled(true);
-      setBackendURL(`${SECOND_BACKEND_URL}/ai/api/generate-sentence-landing`)
+      setBackendURL(`${SECOND_BACKEND_URL}/ai/api/generate-sentence-landing`);
     }
   }, [window]);
 
   useEffect(() => {
     if (isMobile) return;
-    
+
     if (showLoading) {
       if (typeof setIsSuggestedTextAdded === "function") {
-        setIsSuggestedTextAdded(false)
+        setIsSuggestedTextAdded(false);
       }
     }
-  }, [showLoading])
+  }, [showLoading]);
 
   useEffect(() => {
-    const suggestedTextEnabled = localStorage.getItem("suggestedTextEnabled");    
+    const suggestedTextEnabled = localStorage.getItem("suggestedTextEnabled");
     if (suggestedTextEnabled) {
       console.log("Setting suggest text enabled");
       console.log(suggestedTextEnabled == "true");
@@ -68,7 +76,7 @@ export default (prop) => {
     }
 
     return last100Chars;
-  }
+  };
 
   const get200CharactersBehindCursorPos = (editor) => {
     let text = "";
@@ -87,7 +95,7 @@ export default (prop) => {
     }
 
     return first200Chars;
-  }
+  };
 
   useEffect(() => {
     // get editor content and send to API
@@ -96,20 +104,23 @@ export default (prop) => {
 
     if (!prop.editor) return;
     if (!suggestedTextEnabled) return;
-    
+
     const last100Chars = getLast100CharactersText(prop.editor);
     const first100Chars = get200CharactersBehindCursorPos(prop.editor);
 
     const data = {
       query: first100Chars ? first100Chars : last100Chars,
-    }
+    };
 
     if (last100Chars && last100Chars.length > 0) {
       if (!apiCalled) {
         apiCalled = true;
+        setSuggestedTextEnabled(true);
+
         makePostRequest(backendURL, data)
           .then((res) => {
             let nextSentence = res.data;
+
             // if(typeof setApiCallCount === "function"){
             //   setApiCallCount((prevCount) => prevCount + 1)
             // }
@@ -118,31 +129,33 @@ export default (prop) => {
               nextSentence = " " + nextSentence;
             }
             localStorage.setItem("nextSentenceText", nextSentence);
+
             setResponse(nextSentence);
+
             if (!apiCalled1stTime) {
-              setApiCalled1stTime(true)
-              setShowSuggestionsModal(true)
-            } 
+              setApiCalled1stTime(true);
+              setShowSuggestionsModal(true);
+            }
           })
           .catch((err) => {
             console.error(err);
           });
       }
     } else {
-      localStorage.setItem("nextSentenceText", '');
-      setResponse('');
+      localStorage.setItem("nextSentenceText", "");
+      setResponse("");
     }
+
     //dispatch to store
-  }, [prop.editor, suggestedTextEnabled])
+  }, [prop.editor, suggestedTextEnabled]);
 
   useEffect(() => {
-    if (response && typeof setDisableNextButton == 'function') {
-      setDisableNextButton(false)
+    if (response && typeof setDisableNextButton == "function") {
+      setDisableNextButton(false);
+    } else {
+      setDisableNextButton(true);
     }
-    else {
-      setDisableNextButton(true)
-    }
-  }, [response])
+  }, [response]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -152,7 +165,7 @@ export default (prop) => {
   }, [prop.editor]);
 
   if (window.getSelection()?.toString() || isMobile) {
-    return <NodeViewWrapper className="node-view"> </NodeViewWrapper>
+    return <NodeViewWrapper className="node-view"> </NodeViewWrapper>;
   }
 
   return (

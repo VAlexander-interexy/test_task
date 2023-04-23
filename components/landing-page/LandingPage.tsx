@@ -2,12 +2,8 @@ import Card from "@/components/home/card";
 import Layout from "@/components/layout/layout";
 import Balancer from "react-wrap-balancer";
 import { motion } from "framer-motion";
-import {
-  FADE_DOWN_ANIMATION_VARIANTS
-} from "@/lib/constants";
-import {
-  FaRegFileAlt,
-} from "react-icons/fa";
+import { FADE_DOWN_ANIMATION_VARIANTS } from "@/lib/constants";
+import { FaRegFileAlt } from "react-icons/fa";
 import { getMongoUserData } from "mongodb-utils/user";
 import CitationPopover from "@/components/app-home/citation/citation-popover";
 import WebVitals from "@/components/home/web-vitals";
@@ -47,9 +43,13 @@ export default function LandingPage() {
     "stanford.png",
   ];
   // check if logged in
-  const [textString, setTextString] = useState("Napoleon Bonaparte was a French military and political leader who rose to prominence during the French Revolution.");
+  const [textString, setTextString] = useState(
+    "Napoleon Bonaparte was a French military and political leader who rose to prominence during the French Revolution.",
+  );
   const [editor, setEditor] = useState<any>(null);
-  const [defaultTextHTML, setDefaultTextHTML] = useState<String>("<p>Napoleon Bonaparte was a French military and political leader who rose to prominence during the French Revolution.</p>");
+  const [defaultTextHTML, setDefaultTextHTML] = useState<String>(
+    "<p>Napoleon Bonaparte was a French military and political leader who rose to prominence during the French Revolution.</p>",
+  );
   const [textHTML, setTextHTML] = useState("");
   const [isUserPro, setIsUserPro] = useState(false);
   const [wordCount, setWordCount] = useState(0);
@@ -72,7 +72,7 @@ export default function LandingPage() {
     setShowTextSelectedPopover(false);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     getMongoUserData().then((data) => {
       if (data) {
         const userData = data as Record<string, any>;
@@ -81,7 +81,7 @@ export default function LandingPage() {
         }
       }
     });
-  },[])
+  }, []);
 
   const handleTextSelected = (
     text: string,
@@ -101,10 +101,9 @@ export default function LandingPage() {
     if (end.bottom <= 250) {
       TOP_OFFSET_PIXELS = -50;
     }
-    
+
     setPopoverTopOffset(end.bottom + TOP_OFFSET_PIXELS);
     setCitationPopoverTopOffset(end.bottom + TOP_OFFSET_PIXELS);
-
 
     setPopoverLeftOffset(start.left);
     setShowTextSelectedPopover(true);
@@ -117,11 +116,13 @@ export default function LandingPage() {
   const router = useRouter();
 
   const handleShowCitation = () => {
-    mixpanel.track("Clicked Demo Cite")
+    mixpanel.track("Clicked Demo Cite");
     setCitations([]);
     setCitationsLoaded(false);
 
-    const freeCitationsUsed = parseInt(localStorage.getItem("freeCitationsUsed") || '0') ;
+    const freeCitationsUsed = parseInt(
+      localStorage.getItem("freeCitationsUsed") || "0",
+    );
 
     // if used more than 3 citations, redirect
     if (freeCitationsUsed >= 2 && !isUserPro) {
@@ -129,7 +130,10 @@ export default function LandingPage() {
       return;
     } else {
       // otherwise, increment citations used
-      localStorage.setItem("freeCitationsUsed", (freeCitationsUsed + 1).toString());
+      localStorage.setItem(
+        "freeCitationsUsed",
+        (freeCitationsUsed + 1).toString(),
+      );
     }
 
     // hide text selected popover
@@ -162,14 +166,15 @@ export default function LandingPage() {
             setCitationsLoaded(true);
           })
           .catch((err) => {
-            toast.error('Too many words selected or could not find citations for this topic. Please select something else and try a few key words.', { duration: 7500 });
+            toast.error(
+              "Too many words selected or could not find citations for this topic. Please select something else and try a few key words.",
+              { duration: 7500 },
+            );
             console.log("error generating inner citation");
             console.error(err);
           });
       });
   };
-  
-
 
   useEffect(() => {
     if (!suggestText.current) {
@@ -192,12 +197,14 @@ export default function LandingPage() {
     }
   };
 
-  const {   //@ts-ignore
-    showSuggestionsModal,   //@ts-ignore
+  const {
+    //@ts-ignore
+    showSuggestionsModal, //@ts-ignore
     setShowSuggestionsModal,
-    setIsSuggestedTextAdded,   //@ts-ignore
-    isSuggestedTextAdded, 
-    stopHighlightModal, setStopHighlightModal,
+    setIsSuggestedTextAdded, //@ts-ignore
+    isSuggestedTextAdded,
+    stopHighlightModal,
+    setStopHighlightModal,
   } = useTipTap();
 
   useEffect(() => {
@@ -205,7 +212,6 @@ export default function LandingPage() {
       (showSuggestionsModal) => {
         if (showSuggestionsModal) {
           setShowSuggestionsModal(false);
-
         }
       },
       5000,
@@ -218,7 +224,7 @@ export default function LandingPage() {
   }, [showSuggestionsModal]);
 
   useEffect(() => {
-    if(!isSuggestedTextAdded) return;
+    if (!isSuggestedTextAdded) return;
     const timer = setTimeout(
       (isSuggestedTextAdded) => {
         if (isSuggestedTextAdded) {
@@ -340,7 +346,7 @@ export default function LandingPage() {
     // });
   };
 
-     // create a new date and set it as March 27, 2023
+  // create a new date and set it as March 27, 2023
   const stopDate = new Date("March 27, 2023 23:59:00");
   const [email, setEmail] = useState("");
 
@@ -385,7 +391,7 @@ export default function LandingPage() {
         </span>
       );
     }
-  };  
+  };
 
   return (
     <Layout>
@@ -408,7 +414,7 @@ export default function LandingPage() {
           <motion.h1
             className="bg-gradient-to-br from-black to-stone-500 bg-clip-text text-center font-display text-5xl font-bold tracking-[-0.02em] text-transparent drop-shadow-sm md:text-6xl md:leading-[5rem]"
             variants={FADE_DOWN_ANIMATION_VARIANTS}
-            style={{'lineHeight': 'normal'}}
+            style={{ lineHeight: "normal" }}
           >
             <p>The All-in-One Writing Tool</p>
           </motion.h1>
@@ -528,147 +534,155 @@ export default function LandingPage() {
         height={400}
         className="rounded-lg object-contain drop-shadow-xl md:hidden"
       />
-      {!isMobile && <div
-        className={
-          isMobile
-            ? "mt-6 h-screen  w-full pl-[5px] pr-[5px] relative"
-            : "mt-6 w-[45rem] shadow-white relative"
-        }
-        style={{maxHeight: '72vh'}}
-      >
-        <div className="-m-2 mb-0 mt-8 flex flex-wrap items-end justify-between">
-          <div className=" w-full p-2">
-            <h2 className="font-heading flex w-full items-center justify-center text-2xl font-bold md:text-3xl">
-              👇 Start Typing & Pause to See Magic
-              </h2>
-          </div>
-          <div className="w-auto p-2"></div>
-        </div>
-
-        <Tiptap
-          suggestText={suggestText}
-          isWebApp={true}
-          setEditor={setEditor}
-          defaultTextHTML={defaultTextHTML}
-          setTextString={setTextString}
-          setTextHTML={setTextHTML}
-          setWordCount={setWordCount}
-          scrollToPplSentence={scrollToPplSentence}
-          handleTextSelected={handleTextSelected}
-          currDocument={null}
-        />
-        
-        {showSuggestionsModal && !isMobile && (
-          <motion.div
-            initial={{ y: 200, opacity: 0 }}
-            animate={{ y: 40, opacity: 5 }}
-            transition={{ delay: 1, type: "spring", stiffness: 75 }}
-          >
-            <div className="infoDiv">
-              <p>1. {"->"} Right Arrow to accept</p>
-              <p>2. {"<-"} Left Arrow to delete</p>
-            </div>
-          </motion.div>
-        )}
-         {showCitationPopover && (
-        <CitationPopover
-          citations={citations}
-          addAsCitation={addAsCitation}
-          popoverTopOffset={citationPopoverTopOffset}
-          popoverLeftOffset={popoverLeftOffset}
-          setShowCitationPopover={setShowCitationPopover}
-          citationsLoaded={citationsLoaded}
-        />
-      )}
-      
-      {showTextSelectedPopover && (
+      {!isMobile && (
         <div
-          className="absolute"
-          style={{ top: popoverTopOffset, left: popoverLeftOffset }}
+          className={
+            isMobile
+              ? "relative mt-6  h-screen w-full pl-[5px] pr-[5px]"
+              : "relative mt-6 w-[45rem] shadow-white"
+          }
+          style={{ maxHeight: "72vh" }}
         >
-          <div className="text-select-toolbar-wrapper">
-            <div className="text-select-toolbar  rounded-lg">
-              <div className="flex w-full flex-row justify-between">
-                <button
-                  className="flex flex-row items-center justify-start"
-                  onClick={() => handleShowCitation()}
-                >
-                  <FaRegFileAlt size={14} className="mr-2" />
-                    <p className="tracking-wide">Cite</p>
-                </button>
+          <div className="-m-2 mb-0 mt-8 flex flex-wrap items-end justify-between">
+            <div className=" w-full p-2">
+              <h2 className="font-heading flex w-full items-center justify-center text-2xl font-bold md:text-3xl">
+                👇 Start Typing & Pause to See Magic
+              </h2>
+            </div>
+            <div className="w-auto p-2"></div>
+          </div>
+
+          <Tiptap
+            suggestText={suggestText}
+            isWebApp={true}
+            setEditor={setEditor}
+            defaultTextHTML={defaultTextHTML}
+            setTextString={setTextString}
+            setTextHTML={setTextHTML}
+            setWordCount={setWordCount}
+            scrollToPplSentence={scrollToPplSentence}
+            handleTextSelected={handleTextSelected}
+            currDocument={null}
+          />
+
+          {showSuggestionsModal && !isMobile && (
+            <motion.div
+              initial={{ y: 200, opacity: 0 }}
+              animate={{ y: 40, opacity: 5 }}
+              transition={{ delay: 1, type: "spring", stiffness: 75 }}
+            >
+              <div className="infoDiv">
+                <p>1. {"->"} Right Arrow to accept</p>
+                <p>2. {"<-"} Left Arrow to delete</p>
+              </div>
+            </motion.div>
+          )}
+          {showCitationPopover && (
+            <CitationPopover
+              citations={citations}
+              addAsCitation={addAsCitation}
+              popoverTopOffset={citationPopoverTopOffset}
+              popoverLeftOffset={popoverLeftOffset}
+              setShowCitationPopover={setShowCitationPopover}
+              citationsLoaded={citationsLoaded}
+            />
+          )}
+
+          {showTextSelectedPopover && (
+            <div
+              className="absolute"
+              style={{ top: popoverTopOffset, left: popoverLeftOffset }}
+            >
+              <div className="text-select-toolbar-wrapper">
+                <div className="text-select-toolbar  rounded-lg">
+                  <div className="flex w-full flex-row justify-between">
+                    <button
+                      className="flex flex-row items-center justify-start"
+                      onClick={() => handleShowCitation()}
+                    >
+                      <FaRegFileAlt size={14} className="mr-2" />
+                      <p className="tracking-wide">Cite</p>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {isSuggestedTextAdded && !stopHighlightModal && !isMobile && (
+            <motion.div
+              initial={{ y: 200, opacity: 0 }}
+              animate={{ y: 40, opacity: 5 }}
+              transition={{ delay: 1, type: "spring", stiffness: 75 }}
+            >
+              <div className="infoDiv">
+                Highlight a sentence to cite or rewrite it.
+              </div>
+            </motion.div>
+          )}
+
+          {isMobile && (
+            <div className="infoDivMobile">
+              <FaSyncAlt
+                className="ml-4"
+                color="blue"
+                onClick={() => {
+                  if (!window.getSelection()?.toString()) {
+                    editor.commands.insertContent(
+                      `<react-component></react-component>`,
+                    );
+                  }
+                }}
+              />
+              {/* <FaPencilAlt className="ml-4" color="grey" /> */}
+              <FaTrashAlt
+                className="ml-4"
+                color="red"
+                onClick={() => {
+                  editor.commands.deleteNode("reactComponent");
+                }}
+              />
+              <FaCheckCircle
+                className="ml-4"
+                color="green"
+                onClick={() => {
+                  const text = localStorage.getItem("nextSentenceText") || "";
+                  if (editor.commands.deleteNode("reactComponent")) {
+                    editor.commands.insertContent(" " + text);
+                  } else {
+                    editor
+                      .chain()
+                      .focus()
+                      .setTextSelection(
+                        editor.view.state.selection.$anchor.pos + 1,
+                      )
+                      .run();
+                  }
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
-       
-        
-        {isSuggestedTextAdded && !stopHighlightModal && !isMobile && (
-          <motion.div
-            initial={{ y: 200, opacity: 0 }}
-            animate={{ y: 40, opacity: 5 }}
-            transition={{ delay: 1, type: "spring", stiffness: 75 }}
-          >
-            <div className="infoDiv">
-              Highlight a sentence to cite or rewrite it.
-            </div>
-          </motion.div>
-        )}
-
-        {isMobile && (
-          <div className="infoDivMobile">
-            <FaSyncAlt
-              className="ml-4"
-              color="blue"
-              onClick={() => {
-                if(!window.getSelection()?.toString()){
-                  editor.commands.insertContent(`<react-component></react-component>`);
-                }
-              }}
-            />
-            {/* <FaPencilAlt className="ml-4" color="grey" /> */}
-            <FaTrashAlt
-              className="ml-4"
-              color="red"
-              onClick={() => {
-                editor.commands.deleteNode("reactComponent");
-              }}
-            />
-            <FaCheckCircle
-              className="ml-4"
-              color="green"
-              onClick={() => {
-                const text = localStorage.getItem("nextSentenceText") || "";
-                if(editor.commands.deleteNode("reactComponent")){
-                  editor.commands.insertContent(" " + text)
-                }else{
-                  editor.chain().focus().setTextSelection(editor.view.state.selection.$anchor.pos + 1).run()
-                }
-              }}
-            />
-          </div>
-        )}
-      </div>}
       <motion.div
-            className="mx-auto flex items-center justify-center space-x-5 mt-8"
+        className="mx-auto mt-8 flex items-center justify-center space-x-5"
+        variants={FADE_DOWN_ANIMATION_VARIANTS}
+      >
+        <Link
+          href="/login"
+          rel="noreferrer"
+          className="text-lg font-semibold text-white"
+        >
+          <motion.button
             variants={FADE_DOWN_ANIMATION_VARIANTS}
+            onClick={() => mixpanel.track("Clicked Demo Try the real thing")}
+            className="mx-auto mb-5 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full bg-gradient-to-r from-violet-400 to-violet-700 px-10 py-4 drop-shadow-lg transition-colors"
           >
-            <Link
-              href="/login"
-              rel="noreferrer"
-              className="text-lg font-semibold text-white"
-            >
-              <motion.button
-                variants={FADE_DOWN_ANIMATION_VARIANTS}
-                onClick={() => mixpanel.track("Clicked Demo Try the real thing")}
-                className="mx-auto mb-5 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full bg-gradient-to-r from-violet-400 to-violet-700 px-10 py-4 drop-shadow-lg transition-colors"
-              >
-                <p>Try the real thing</p>
-                <FaArrowRight className="ml-4" />
-
-              </motion.button>
-            </Link>
-          </motion.div>
+            <p>Try the real thing</p>
+            <FaArrowRight className="ml-4" />
+          </motion.button>
+        </Link>
+      </motion.div>
       <section className="relative pb-32">
         <div className="relative z-10 mx-auto mt-32 px-4 xl:mx-24">
           <div className="-m-2 mb-12 flex flex-wrap items-end justify-between">
@@ -1259,7 +1273,7 @@ export default function LandingPage() {
                 />
               ))}
             </div>
-           <p className="text-center font-medium text-gray-600">
+            <p className="text-center font-medium text-gray-600">
               <span>Still have any questions? </span>
               <a
                 className="font-semibold text-indigo-600 hover:text-indigo-700"

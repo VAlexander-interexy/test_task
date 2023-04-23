@@ -24,7 +24,7 @@ import Link from "@tiptap/extension-link";
 import Superscript from "@tiptap/extension-superscript";
 // import Placeholder from '@tiptap/extension-placeholder'
 import NonEditableText from "./nonEditableText";
-// import NonEditableTextView from './nonEditableTextView';
+import NonEditableTextView from "./nonEditableTextView";
 import debounce from "lodash.debounce";
 import { TiptapContext } from "context/TiptapContext";
 
@@ -121,7 +121,7 @@ export const Tiptap = ({
   scrollToPplSentence,
   handleTextSelected,
   suggestText,
-  currDocument
+  currDocument,
 }) => {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
@@ -133,103 +133,118 @@ export const Tiptap = ({
     setIsSuggestedTextAdded,
   } = useContext(TiptapContext);
 
+  const editor = isMobile
+    ? useEditor({
+        // extensions
+        extensions: [
+          StarterKit,
+          Underline,
+          CharacterCount,
+          Highlight.configure({
+            multicolor: true,
+          }),
+          Paragraph.configure({
+            HTMLAttributes: {
+              class: "tiptap-paragraph",
+            },
+          }),
+          Link.configure({
+            openOnClick: true,
+          }),
+          Superscript,
+        ],
+        // when typed
+        onUpdate: ({ editor }) => {
+          const html = editor.getHTML();
+          const text = editor.getText();
+          setWordCount(editor.storage.characterCount.words());
+          setTextHTML(html);
+          setTextString(text);
 
-  const editor = isMobile ?  useEditor({
-    // extensions
-    extensions: [StarterKit, Underline, CharacterCount, Highlight.configure({
-      multicolor: true
-    }),
-    Paragraph.configure({
-      HTMLAttributes: {
-        class: 'tiptap-paragraph',
-      },
-    }), 
-    Link.configure({
-      openOnClick: true,
-    }), Superscript],
-    // when typed
-    onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-      const text = editor.getText();
-      setWordCount(editor.storage.characterCount.words());
-      setTextHTML(html);
-      setTextString(text);
+          addListenerToHighlights();
 
-      addListenerToHighlights();
-
-      // add a debouncer to save the text
-      saveDocumentDebounced(html, currDocument);
-    },
-    onTransaction: ({ editor }) => {
-      const { doc } = editor.view.state;
-      if (suggestText && !suggestText.current) {
-        suggestText.current = true;
-     
-        doc.descendants((node, pos) => {
-          if (node.type.name === "reactComponent") {
-            if(typeof setShowSuggestionsModal == 'function'){
-              setIsSuggestedTextAdded(true)
-            }
-            editor.commands?.deleteRange({ from: pos, to: pos + 1 });
+          // add a debouncer to save the text
+          saveDocumentDebounced(html, currDocument);
+        },
+        onTransaction: ({ editor }) => {
+          const { doc } = editor.view.state;
+          if (suggestText && !suggestText.current) {
+            suggestText.current = true;
+            doc.descendants((node, pos) => {
+              if (node.type.name === "reactComponent") {
+                if (typeof setShowSuggestionsModal == "function") {
+                  setIsSuggestedTextAdded(true);
+                }
+                editor.commands?.deleteRange({ from: pos, to: pos + 1 });
+              }
+            });
           }
-        });
-      }
-      doc.descendants((node, pos) => {
-        if (node.type.name === "reactComponent") {
-          setShowModal(true);
-        }
-      });
-      handleTextSelection(editor);
-    },
-  }) :  useEditor({
-    // extensions
-    extensions: [StarterKit, Underline, CharacterCount, Highlight.configure({
-      multicolor: true
-    }),
-    NonEditableText,
-    Paragraph.configure({
-      HTMLAttributes: {
-        class: 'tiptap-paragraph',
-      },
-    }), 
-    Link.configure({
-      openOnClick: true,
-    }), Superscript],
-    // when typed
-    onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-      const text = editor.getText();
-      setWordCount(editor.storage.characterCount.words());
-      setTextHTML(html);
-      setTextString(text);
-
-      addListenerToHighlights();
-
-      // add a debouncer to save the text
-      saveDocumentDebounced(html, currDocument);
-    },
-    onTransaction: ({ editor }) => {
-      const { doc } = editor.view.state;
-      if (suggestText && !suggestText.current) {
-        suggestText.current = true;
-     
-        doc.descendants((node, pos) => {
-          if (node.type.name === "reactComponent") {
-            if(typeof setShowSuggestionsModal == 'function'){
-              setIsSuggestedTextAdded(true)
+          doc.descendants((node, pos) => {
+            if (node.type.name === "reactComponent") {
+              setShowModal(true);
             }
-            editor.commands?.deleteRange({ from: pos, to: pos + 1 });
+          });
+          handleTextSelection(editor);
+        },
+      })
+    : useEditor({
+        // extensions
+        extensions: [
+          StarterKit,
+          Underline,
+          CharacterCount,
+          Highlight.configure({
+            multicolor: true,
+          }),
+          NonEditableText,
+          Paragraph.configure({
+            HTMLAttributes: {
+              class: "tiptap-paragraph",
+            },
+          }),
+          Link.configure({
+            openOnClick: true,
+          }),
+          Superscript,
+        ],
+        // when typed
+        onUpdate: ({ editor }) => {
+          const html = editor.getHTML();
+          const text = editor.getText();
+          setWordCount(editor.storage.characterCount.words());
+          setTextHTML(html);
+          setTextString(text);
+
+          addListenerToHighlights();
+          // add a debouncer to save the text
+          saveDocumentDebounced(html, currDocument);
+        },
+        onTransaction: ({ editor }) => {
+          const { doc } = editor.view.state;
+          if (suggestText && !suggestText.current) {
+            suggestText.current = true;
+
+            doc.descendants((node, pos) => {
+              if (node.type.name === "reactComponent") {
+                if (typeof setShowSuggestionsModal == "function") {
+                  setIsSuggestedTextAdded(true);
+                }
+                editor.commands?.deleteRange({ from: pos, to: pos + 1 });
+              }
+            });
+
+            //! Prevent multiple request after rewtire prompts with the cobination
+            //! this.editor.commands.blur() at nonEditableText.tsx
+            editor.commands.joinBackward();
           }
-        });
-      }
-      doc.descendants((node, pos) => {
-        if (node.type.name === "reactComponent") {
-          setShowModal(true);
-        }
+          doc.descendants((node, pos) => {
+            if (node.type.name === "reactComponent") {
+              setShowModal(true);
+            }
+          });
+          handleTextSelection(editor);
+        },
       });
-      handleTextSelection(editor);
-    },
-  });
 
   // Set editor for parent component
   useEffect(() => {
@@ -247,11 +262,12 @@ export const Tiptap = ({
 
   const highlightClickListener = (mark) => {
     scrollToPplSentence(mark);
-  }
+  };
 
   const addListenerToHighlights = () => {
     // get all mark elements
     const marks = document.querySelectorAll("mark");
+
     // loop through all mark elements
     marks.forEach((mark) => {
       // remove click listener if it exists
@@ -274,7 +290,6 @@ export const Tiptap = ({
     let start = view.coordsAtPos(from),
       end = view.coordsAtPos(to);
 
-
     if (handleTextSelected) {
       // Always called
       handleTextSelected(text, start, end);
@@ -294,7 +309,13 @@ export const Tiptap = ({
 
   return (
     <div
-      className={isMobile ? "mobileTextEditor" : isWebApp && router.asPath.includes("app") ? "textEditorApp" : "textEditor"}
+      className={
+        isMobile
+          ? "mobileTextEditor"
+          : isWebApp && router.asPath.includes("app")
+          ? "textEditorApp"
+          : "textEditor"
+      }
       style={{ height: `${isWebApp ? "90vh !important" : ""}` }}
     >
       {/* {showModal && !router.asPath.includes("app") && !router.asPath.includes("bypass") ? (

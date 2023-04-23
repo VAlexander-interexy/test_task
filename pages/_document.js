@@ -4,15 +4,18 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4213967862143118"
-      crossOrigin="anonymous"></script>
         <script
-            async
-            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
-          />
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4213967862143118"
+          crossOrigin="anonymous"
+        ></script>
+        <script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
@@ -20,8 +23,9 @@ export default function Document() {
               page_path: window.location.pathname,
             });
           `,
-            }}
-          /></Head>
+          }}
+        />
+      </Head>
       <body>
         <Main />
         <NextScript />
